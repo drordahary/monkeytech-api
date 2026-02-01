@@ -1,73 +1,72 @@
-🐒 FastRider Backend API
+# 🐒 FastRider Backend API
 
 A backend service for managing theme-park attractions and a FastRider reservation system, including authentication, booking, cancellation, and capacity management.
 
 Built as a take-home assignment using Fastify, PostgreSQL, Sequelize, and Docker.
 
-🚀 Tech Stack
+---
 
-Node.js + TypeScript
+## 🚀 Tech Stack
 
-Fastify
+- **Runtime:** Node.js + TypeScript
+- **Framework:** Fastify
+- **Database:** PostgreSQL
+- **ORM:** Sequelize (with migrations)
+- **Auth:** JWT Authentication
+- **Infrastructure:** Docker & Docker Compose
 
-PostgreSQL
+---
 
-Sequelize (ORM + migrations)
+## 📦 Features
 
-JWT Authentication
+### Core Functionality
 
-Docker & Docker Compose
+- Areas & locations API
+- Attractions vs food locations
+- FastRider slot generation
+- Slot capacity enforcement
 
-📦 Features
-Core
+### FastRider System
 
-Areas & locations API
+- Book a FastRider slot
+- One active ticket per user
+- Transactional booking
+- Cancellation with capacity release
+- Daily slot generation
 
-Attractions vs food locations
+### Authentication
 
-FastRider slot generation
+- Phone-based one-time code (OTP)
+- JWT authentication
+- Rate-limited auth endpoints
 
-Slot capacity enforcement
+---
 
-FastRider System
+## 🛠️ Installation & Running Locally
 
-Book a FastRider slot
+### Prerequisites
 
-One active ticket per user
+Ensure you have the following installed:
 
-Transactional booking
+- Docker
+- Docker Compose
 
-Cancellation with capacity release
+> **Note:** No local Node.js or PostgreSQL installation is required.
 
-Daily slot generation
+### Step 1: Clone the repository
 
-Authentication
-
-Phone-based one-time code (OTP)
-
-JWT authentication
-
-Rate-limited auth endpoints
-
-🛠️ Installation & Running Locally
-Prerequisites
-
-Docker
-
-Docker Compose
-
-No local Node.js or PostgreSQL installation is required.
-
-1️⃣ Clone the repository
+```bash
 git clone <your-repo-url>
 cd <repo-name>
+```
 
-2️⃣ Environment variables
+### Step 2: Configure environment variables
 
-The project uses a .env file for local development only.
+The project uses a `.env` file for local development only.
 
-Create a .env file in the project root:
+Create a `.env` file in the project root:
 
+```bash
 NODE_ENV=development
 PORT=3000
 
@@ -80,143 +79,199 @@ DB_PASSWORD=fastrider
 JWT_SECRET=super_secret
 AUTH_CODE_TTL_SECONDS=300
 AUTH_DEV_ECHO_CODE=true
+```
 
-📌 Notes:
+> **Important:**
+>
+> - `AUTH_DEV_ECHO_CODE=true` causes OTP codes to be returned in the response (no SMS dependency)
+> - In production, this should be set to `false`
 
-AUTH_DEV_ECHO_CODE=true causes OTP codes to be returned in the response (no SMS dependency).
+### Step 3: Start the system
 
-In production this should be false.
-
-3️⃣ Start the system
+```bash
 docker compose up --build
+```
 
 This will:
 
-Start PostgreSQL
+1. Start PostgreSQL
+2. Run migrations
+3. Start the API on `http://localhost:3000`
 
-Run migrations
+### Step 4: Verify the installation
 
-Start the API on http://localhost:3000
+Test the health endpoint:
 
-4️⃣ Health check
+```bash
 curl http://localhost:3000/health
+```
 
-Expected response:
+**Expected response:**
 
+```json
 { "status": "ok" }
+```
 
-🔐 Authentication Flow
-Request OTP code
-POST /auth/request-code
+---
 
-{ "phone": "+972500000000" }
+## 🔐 Authentication Flow
 
-Dev response (only in development):
+### Request OTP Code
 
-{ "ok": true, "devCode": "123456" }
+**Endpoint:** `POST /auth/request-code`
 
-Verify code & receive JWT
-POST /auth/verify-code
+**Request body:**
 
-{ "phone": "+972500000000", "code": "123456" }
+```json
+{
+  "phone": "+972500000000"
+}
+```
 
-Response:
+**Development response:**
 
-{ "token": "<JWT>" }
+```json
+{
+  "ok": true,
+  "devCode": "123456"
+}
+```
 
-Use this token in subsequent requests:
+> This response is only returned when `AUTH_DEV_ECHO_CODE=true`
 
+### Verify Code & Receive JWT
+
+**Endpoint:** `POST /auth/verify-code`
+
+**Request body:**
+
+```json
+{
+  "phone": "+972500000000",
+  "code": "123456"
+}
+```
+
+**Response:**
+
+```json
+{
+  "token": "<JWT>"
+}
+```
+
+### Using the JWT Token
+
+Include the token in subsequent requests:
+
+```
 Authorization: Bearer <JWT>
+```
 
-🎟️ FastRider API
-Book a FastRider ticket
-POST /fastrider/:attractionId/book
+---
+
+## 🎟️ FastRider API
+
+### Book a FastRider Ticket
+
+**Endpoint:** `POST /fastrider/:attractionId/book`
+
+**Headers:**
+
+```
 Authorization: Bearer <JWT>
+```
 
-Rules:
+**Business Rules:**
 
-User may have only one active FastRider ticket
+- User may have only one active FastRider ticket
+- Slot capacity is enforced
+- Booking is transactional
 
-Slot capacity is enforced
+---
 
-Booking is transactional
+### Get Active Ticket
 
-Get active ticket
-GET /fastrider/my-ticket
+**Endpoint:** `GET /fastrider/my-ticket`
+
+**Headers:**
+
+```
 Authorization: Bearer <JWT>
+```
 
-Cancel active ticket
-POST /fastrider/cancel
+---
+
+### Cancel Active Ticket
+
+**Endpoint:** `POST /fastrider/cancel`
+
+**Headers:**
+
+```
 Authorization: Bearer <JWT>
+```
 
-Cancelling:
+**Cancellation behavior:**
 
-Marks ticket as CANCELLED
+- Marks ticket as `CANCELLED`
+- Releases slot capacity
 
-Releases slot capacity
+---
 
-⏱️ Rate Limiting
+## ⏱️ Rate Limiting
 
-Authentication endpoints are protected:
+Authentication endpoints are protected against abuse:
 
-/auth/request-code
-5 requests / minute / IP
+| Endpoint             | Limit                     |
+| -------------------- | ------------------------- |
+| `/auth/request-code` | 5 requests / minute / IP  |
+| `/auth/verify-code`  | 10 requests / minute / IP |
 
-/auth/verify-code
-10 requests / minute / IP
+This prevents brute-force attempts and system abuse.
 
-This prevents abuse and brute-force attempts.
+---
 
-🧠 Design Decisions & Assumptions
+## 🧠 Design Decisions & Assumptions
 
-Authentication
+### Authentication
 
-OTP codes are stored hashed
+- OTP codes are stored hashed for security
+- JWT is used for stateless authentication
+- Phone-based auth was chosen for simplicity
 
-JWT is used for stateless auth
+### Slot Generation
 
-Phone-based auth was chosen for simplicity
+- Slots are generated daily
+- Currently triggered on application startup
+- In production, this would be handled by a scheduled job (cron)
 
-Slot Generation
+### Transactions & Locking
 
-Slots are generated daily
+- Booking and cancellation are fully transactional
+- Explicit row-level locking is used to avoid race conditions
+- PostgreSQL locking constraints are respected (no locking on outer joins)
 
-Currently triggered on application startup
+### Environment Separation
 
-In production this would be handled by a scheduled job (cron)
+- `.env` is used for local development
+- Docker Compose injects environment variables
+- No secrets are hard-coded
 
-Transactions & Locking
+---
 
-Booking and cancellation are fully transactional
+## ⚠️ Limitations / Future Improvements
 
-Explicit row-level locking is used to avoid race conditions
+- [ ] Replace OTP echo with real SMS provider
+- [ ] Add user profile endpoint
+- [ ] Add admin endpoints for attraction management
+- [ ] Add pagination & filtering
+- [ ] Improve observability (metrics, tracing)
 
-PostgreSQL locking constraints are respected (no locking on outer joins)
+---
 
-Environment Separation
+## 🧪 Development Notes
 
-.env is used for local development
-
-Docker Compose injects environment variables
-
-No secrets are hard-coded
-
-⚠️ Limitations / Future Improvements
-
-Replace OTP echo with real SMS provider
-
-Add user profile endpoint
-
-Add admin endpoints for attraction management
-
-Add pagination & filtering
-
-Improve observability (metrics, tracing)
-
-🧪 Development Notes
-
-All database changes are handled via migrations
-
-The system can be started from a clean state using Docker
-
-No manual DB setup is required
+- All database changes are handled via migrations
+- The system can be started from a clean state using Docker
+- No manual DB setup is required
