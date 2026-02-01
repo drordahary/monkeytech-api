@@ -56,8 +56,8 @@ Ensure you have the following installed:
 ### Step 1: Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd <repo-name>
+git clone https://github.com/drordahary/monkeytech-api
+cd monkeytech-api
 ```
 
 ### Step 2: Configure environment variables
