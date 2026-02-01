@@ -1,0 +1,13 @@
+1. Help debug a Sequelize + PostgreSQL error related to UUID primary keys and default values.
+
+2. Explain why PostgreSQL throws “FOR UPDATE cannot be applied to the nullable side of an outer join” and suggest a fix.
+
+3. Help design a transactional booking flow with capacity enforcement and race-condition safety.
+
+4. Help implement JWT authentication with Fastify, including a request preHandler.
+
+5. Debug why request.user is undefined even though JWT verification succeeds.
+
+6. Review my FastRider cancellation logic for correctness and concurrency safety.
+
+7. Help structure a professional README with installation instructions and design notes.

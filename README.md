@@ -56,8 +56,8 @@ Ensure you have the following installed:
 ### Step 1: Clone the repository
 
 ```bash
-git clone https://github.com/drordahary/monkeytech-api
-cd monkeytech-api
+git clone <your-repo-url>
+cd <repo-name>
 ```
 
 ### Step 2: Configure environment variables
@@ -260,18 +260,38 @@ This prevents brute-force attempts and system abuse.
 
 ---
 
-## ⚠️ Limitations / Future Improvements
-
-- [ ] Replace OTP echo with real SMS provider
-- [ ] Add user profile endpoint
-- [ ] Add admin endpoints for attraction management
-- [ ] Add pagination & filtering
-- [ ] Improve observability (metrics, tracing)
-
----
-
 ## 🧪 Development Notes
 
 - All database changes are handled via migrations
 - The system can be started from a clean state using Docker
 - No manual DB setup is required
+
+---
+
+## 🤖 AI Assistance
+
+This project was developed with the assistance of AI tools as part of the development process.
+
+### AI Tools Used
+
+- **ChatGPT** (OpenAI, GPT-4.x family)
+
+### How AI Was Used
+
+- High-level system and API design discussions
+- Generating initial drafts of code snippets and database schemas
+- Debugging runtime issues (Fastify, Sequelize, PostgreSQL)
+- Clarifying framework behavior (transactions, locking, JWT handling)
+- Improving documentation structure and README clarity
+
+### Where I Intervened / Corrected AI Output
+
+- Adapted generated code to match project constraints and requirements
+- Fixed ORM edge cases (UUID handling, timestamps, locking behavior)
+- Adjusted authentication logic (JWT claims, Fastify plugin order)
+- Refined transactional logic to avoid PostgreSQL locking errors
+- Reviewed and tested all code paths manually
+
+> **Disclaimer:** All final code was reviewed, understood, and tested by the author. AI was used as a productivity and learning aid, not as a substitute for understanding or decision-making.
+
+> **Security Note:** No private keys, secrets, or sensitive data were shared with AI tools.
