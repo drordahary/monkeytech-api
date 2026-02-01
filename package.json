@@ -15,7 +15,8 @@
     "fastify": "^5.7.2",
     "pg": "^8.17.2",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "umzug": "^3.8.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
@@ -25,9 +26,9 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "dev": "npm run db:prepare && ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "npm run db:prepare && node dist/server.js",
+    "db:prepare": "npm run db:migrate && npm run db:seed",
     "db:migrate": "sequelize-cli db:migrate",
     "db:seed": "sequelize-cli db:seed:all"
   }
